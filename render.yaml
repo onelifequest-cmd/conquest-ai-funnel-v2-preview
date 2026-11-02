@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: conquest-ai-funnel-v2-preview
+    runtime: static
+    repo: https://github.com/onelifequest-cmd/conquest-ai-funnel-v2-preview
+    branch: main
+    buildCommand: echo static
+    staticPublishPath: ./
+    headers:
+      - path: /*
+        name: X-Robots-Tag
+        value: noindex, nofollow

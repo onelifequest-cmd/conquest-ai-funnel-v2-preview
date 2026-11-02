@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Conquest AI · The Machine (mockup)</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --blue-deep: #0047DF;
+    --blue: #1F6FFF;
+    --blue-bright: #02A1FE;
+    --sky: #7CC4FF;
+    --cyan: #22D3EE;
+    --silver: #9DA5B1;
+    --silver-light: #E8ECF0;
+    --bg: #050B18;
+    --bg-2: #081226;
+    --surface: #0B1730;
+    --surface-2: #0F1D3A;
+    --line: #1B2A4A;
+    --line-2: #26385E;
+    --text: #EEF4FF;
+    --text-2: #B4C2D9;
+    --muted: #8293AE;
+    --green: #2BD9A0;
+    --radius: 16px;
+    --font: "Inter", system-ui, -apple-system, sans-serif;
+    --display: "Space Grotesk", "Inter", system-ui, sans-serif;
+    --shadow: 0 20px 60px rgba(0, 20, 60, 0.45);
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+  body {
+    margin: 0;
+    font-family: var(--font);
+    font-size: 17px;
+    line-height: 1.55;
+    color: var(--text);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--sky); text-decoration: none; }
+  a:hover { color: #fff; }
+  img { max-width: 100%; display: block; }
+  .wrap { width: min(1120px, calc(100% - 40px)); margin-inline: auto; }
+  .wrap-wide { width: min(1200px, calc(100% - 40px)); margin-inline: auto; }
+
+  /* Nav */
+  .nav {
+    position: sticky; top: 0; z-index: 40;
+    backdrop-filter: blur(14px);
+    background: rgba(5, 11, 24, 0.72);
+    border-bottom: 1px solid rgba(27, 42, 74, 0.8);
+  }
+  .nav-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; padding: 14px 0;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    font-family: var(--display); font-weight: 700; font-size: 18px; color: #fff;
+  }
+  .logo-mark {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--blue-deep), var(--blue-bright));
+    box-shadow: 0 0 24px rgba(2, 161, 254, 0.35);
+    position: relative;
+  }
+  .logo-mark::after {
+    content: ""; position: absolute; inset: 7px;
+    border: 2px solid rgba(255,255,255,0.85); border-radius: 4px;
+  }
+  .nav-links { display: flex; gap: 22px; align-items: center; }
+  .nav-links a { color: var(--text-2); font-size: 14px; font-weight: 500; }
+  .nav-links a:hover { color: #fff; }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 12px 20px; border-radius: 999px; border: 1px solid transparent;
+    font-weight: 600; font-size: 15px; cursor: pointer; font-family: inherit;
+    transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--blue-deep), var(--blue-bright));
+    color: #fff;
+    box-shadow: 0 8px 28px rgba(0, 71, 223, 0.35);
+  }
+  .btn-ghost {
+    background: transparent; color: var(--text);
+    border-color: var(--line-2);
+  }
+  .btn-ghost:hover { border-color: var(--sky); background: rgba(31,111,255,0.08); }
+  .btn-sm { padding: 9px 16px; font-size: 14px; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 12px; border-radius: 999px;
+    background: rgba(31,111,255,0.12); border: 1px solid rgba(124,196,255,0.25);
+    color: var(--sky); font-size: 13px; font-weight: 600; letter-spacing: 0.02em;
+  }
+  .pill .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--green); box-shadow: 0 0 10px var(--green);
+  }
+
+  /* Hero */
+  .hero {
+    position: relative; min-height: min(92vh, 900px);
+    display: flex; align-items: center; overflow: hidden;
+    background: radial-gradient(ellipse 80% 60% at 50% 40%, #0a1a3a 0%, var(--bg) 70%);
+  }
+  #wave-canvas {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 0;
+  }
+  .hero-content {
+    position: relative; z-index: 2; padding: 72px 0 56px;
+    text-align: center; max-width: 860px; margin-inline: auto;
+  }
+  .hero h1 {
+    font-family: var(--display); font-weight: 700;
+    font-size: clamp(2.2rem, 5vw, 3.6rem); line-height: 1.12;
+    letter-spacing: -0.03em; margin: 18px 0 18px; color: #fff;
+  }
+  .hero h1 .accent {
+    background: linear-gradient(90deg, var(--sky), var(--cyan));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .hero-lead {
+    font-size: 1.125rem; color: var(--text-2); max-width: 620px;
+    margin: 0 auto 28px;
+  }
+  .hero-ctas { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+  .hero-meta {
+    margin-top: 28px; display: flex; flex-wrap: wrap; gap: 18px 28px;
+    justify-content: center; color: var(--muted); font-size: 14px;
+  }
+  .hero-meta strong { color: var(--text-2); font-weight: 600; }
+  .phone-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    color: #fff; font-weight: 600;
+  }
+  .phone-link svg { width: 18px; height: 18px; stroke: var(--cyan); }
+
+  /* Sections */
+  section { padding: 88px 0; position: relative; }
+  .section-head { text-align: center; max-width: 640px; margin: 0 auto 48px; }
+  .section-head .eyebrow {
+    display: inline-block; margin-bottom: 12px;
+    color: var(--sky); font-size: 13px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .section-head h2 {
+    font-family: var(--display); font-size: clamp(1.75rem, 3.5vw, 2.4rem);
+    letter-spacing: -0.02em; margin: 0 0 12px; color: #fff;
+  }
+  .section-head p { margin: 0; color: var(--text-2); font-size: 1.05rem; }
+
+  /* Services grid */
+  .services { background: linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%); }
+  .grid-6 {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+  }
+  .card {
+    background: linear-gradient(160deg, rgba(15,29,58,0.9), rgba(11,23,48,0.75));
+    border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 24px;
+    box-shadow: var(--shadow);
+    transition: border-color .2s ease, transform .2s ease;
+  }
+  .card:hover { border-color: rgba(124,196,255,0.35); transform: translateY(-2px); }
+  .card-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    display: grid; place-items: center; margin-bottom: 16px;
+    background: rgba(31,111,255,0.15); border: 1px solid rgba(124,196,255,0.25);
+    color: var(--sky);
+  }
+  .card-icon svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.75; }
+  .card h3 { margin: 0 0 8px; font-size: 1.05rem; color: #fff; font-weight: 600; }
+  .card p { margin: 0; color: var(--muted); font-size: 15px; }
+  .status {
+    display: inline-block; margin-top: 14px; font-size: 12px; font-weight: 700;
+    letter-spacing: 0.04em; text-transform: uppercase;
+    color: var(--green);
+  }
+  .status.coming { color: var(--sky); }
+  .status.test { color: #F5B544; }
+
+  /* How it works */
+  .how { background: var(--bg-2); }
+  .steps {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+  }
+  .step {
+    position: relative; padding: 28px 24px;
+    border-radius: var(--radius);
+    background: var(--surface);
+    border: 1px solid var(--line);
+  }
+  .step-num {
+    font-family: var(--display); font-size: 2rem; font-weight: 700;
+    background: linear-gradient(135deg, var(--blue), var(--cyan));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    margin-bottom: 8px;
+  }
+  .step h3 { margin: 0 0 8px; color: #fff; font-size: 1.1rem; }
+  .step p { margin: 0; color: var(--muted); font-size: 15px; }
+
+  /* Pricing / ROI */
+  .pricing { background: var(--bg); }
+  .roi-panel {
+    display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 28px;
+    align-items: stretch;
+  }
+  .roi-card, .plan-card {
+    background: linear-gradient(160deg, var(--surface-2), var(--surface));
+    border: 1px solid var(--line-2);
+    border-radius: 20px; padding: 32px;
+    box-shadow: var(--shadow);
+  }
+  .roi-card h3, .plan-card h3 {
+    margin: 0 0 6px; font-family: var(--display); font-size: 1.35rem; color: #fff;
+  }
+  .roi-card .sub, .plan-card .sub { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+  .slider-row { margin-bottom: 22px; }
+  .slider-row label {
+    display: flex; justify-content: space-between; margin-bottom: 8px;
+    font-size: 14px; color: var(--text-2); font-weight: 500;
+  }
+  .slider-row label span { color: var(--sky); font-weight: 700; font-variant-numeric: tabular-nums; }
+  input[type="range"] {
+    -webkit-appearance: none; appearance: none; width: 100%; height: 6px;
+    border-radius: 999px; background: var(--line-2); outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue), var(--cyan));
+    border: 2px solid #fff; cursor: pointer;
+    box-shadow: 0 0 16px rgba(2,161,254,0.5);
+  }
+  .roi-result {
+    margin-top: 8px; padding: 20px; border-radius: 14px;
+    background: rgba(31,111,255,0.1); border: 1px solid rgba(124,196,255,0.25);
+  }
+  .roi-result .big {
+    font-family: var(--display); font-size: 2.4rem; font-weight: 700; color: #fff;
+    letter-spacing: -0.02em;
+  }
+  .roi-result .note { font-size: 13px; color: var(--muted); margin-top: 6px; }
+  .plan-price {
+    font-family: var(--display); font-size: 1.8rem; font-weight: 700; color: #fff;
+    margin: 12px 0 4px;
+  }
+  .plan-price small { font-size: 0.95rem; color: var(--muted); font-weight: 500; }
+  .plan-list { list-style: none; padding: 0; margin: 20px 0 28px; }
+  .plan-list li {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 8px 0; color: var(--text-2); font-size: 15px;
+    border-bottom: 1px solid rgba(27,42,74,0.6);
+  }
+  .plan-list li:last-child { border-bottom: 0; }
+  .check {
+    flex-shrink: 0; width: 18px; height: 18px; margin-top: 2px;
+    color: var(--cyan);
+  }
+  .placeholder-tag {
+    display: inline-block; margin-left: 8px; padding: 2px 8px;
+    border-radius: 6px; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.04em; text-transform: uppercase;
+    background: rgba(245,181,68,0.15); color: #F5B544;
+    border: 1px solid rgba(245,181,68,0.35);
+  }
+
+  /* Testimonials */
+  .social { background: var(--bg-2); }
+  .quotes {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+  }
+  .quote {
+    padding: 24px; border-radius: var(--radius);
+    background: var(--surface); border: 1px solid var(--line);
+  }
+  .quote p { margin: 0 0 16px; color: var(--text-2); font-size: 15px; font-style: italic; }
+  .quote .who { display: flex; align-items: center; gap: 12px; }
+  .avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--line-2), var(--blue));
+    display: grid; place-items: center; font-weight: 700; font-size: 13px; color: #fff;
+  }
+  .quote .name { font-weight: 600; color: #fff; font-size: 14px; }
+  .quote .role { font-size: 12px; color: var(--muted); }
+
+  /* FAQ */
+  .faq { background: var(--bg); }
+  .faq-list { max-width: 760px; margin: 0 auto; }
+  details {
+    border: 1px solid var(--line); border-radius: 12px;
+    background: var(--surface); margin-bottom: 10px; padding: 0 18px;
+  }
+  summary {
+    cursor: pointer; list-style: none; padding: 18px 0;
+    font-weight: 600; color: #fff; font-size: 16px;
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::after {
+    content: "+"; font-size: 22px; color: var(--sky); font-weight: 400;
+  }
+  details[open] summary::after { content: "−"; }
+  details .ans { padding: 0 0 18px; color: var(--text-2); font-size: 15px; }
+
+  /* Final CTA */
+  .final {
+    padding: 100px 0;
+    background:
+      radial-gradient(ellipse 70% 80% at 50% 100%, rgba(0,71,223,0.35), transparent 60%),
+      var(--bg-2);
+    text-align: center;
+  }
+  .final h2 {
+    font-family: var(--display); font-size: clamp(1.8rem, 4vw, 2.8rem);
+    margin: 0 0 14px; color: #fff; letter-spacing: -0.02em;
+  }
+  .final p { color: var(--text-2); max-width: 520px; margin: 0 auto 28px; }
+  .final .hero-ctas { margin-bottom: 18px; }
+  .disclaimer {
+    font-size: 12px; color: var(--muted); max-width: 720px; margin: 40px auto 0;
+    line-height: 1.5;
+  }
+
+  footer {
+    border-top: 1px solid var(--line); padding: 28px 0;
+    color: var(--muted); font-size: 13px;
+  }
+  .foot-inner { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
+
+  @media (max-width: 900px) {
+    .grid-6, .steps, .quotes, .roi-panel { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+    .hero { min-height: 78vh; }
+  }
+  @media (max-width: 640px) {
+    .grid-6 { grid-template-columns: 1fr; }
+    section { padding: 64px 0; }
+    .hero-content { padding: 56px 0 40px; }
+  }
+
+  .draft-preview-badge {
+    position: fixed; top: 14px; left: 14px; z-index: 100;
+    padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 700;
+    letter-spacing: 0.04em; text-transform: uppercase;
+    background: rgba(245,181,68,0.18); color: #F5B544;
+    border: 1px solid rgba(245,181,68,0.45);
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+  <div class="draft-preview-badge" aria-label="Draft preview">Draft preview · not live</div>
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a class="logo" href="#top" aria-label="Conquest AI home">
+        <span class="logo-mark" aria-hidden="true"></span>
+        Conquest AI
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="#services">Services</a>
+        <a href="#how">How it works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <a class="btn btn-primary btn-sm" href="#book">Book a demo</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-label="Hero">
+      <canvas id="wave-canvas" aria-hidden="true"></canvas>
+      <div class="wrap hero-content">
+        <span class="pill"><span class="dot" aria-hidden="true"></span> Grace is live · call anytime</span>
+        <h1>An AI receptionist that <span class="accent">answers every call</span> for your credit repair business</h1>
+        <p class="hero-lead">
+          Grace answers in your business name, books consultations, texts missed callers back, and runs follow-ups — inside the tools you already use. Nothing goes out without your OK.
+        </p>
+        <div class="hero-ctas">
+          <a class="btn btn-primary" href="#book">Book a demo</a>
+          <a class="btn btn-ghost phone-link" href="tel:+14078639276">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.81.36 1.6.68 2.34a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.74.32 1.53.55 2.34.68A2 2 0 0 1 22 16.92z"/></svg>
+            Call Grace now · (407) 863-9276
+          </a>
+        </div>
+        <div class="hero-meta">
+          <span><strong>24/7</strong> call answering</span>
+          <span><strong>Your</strong> number &amp; accounts</span>
+          <span><strong>You</strong> approve what goes out</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="services" id="services">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="eyebrow">What you get</span>
+          <h2>Your AI team for credit repair ops</h2>
+          <p>Hand off the phone, the follow-ups, and the busywork. Real people stay behind the scenes — and you stay in control.</p>
+        </div>
+        <div class="grid-6">
+          <article class="card">
+            <div class="card-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.81.36 1.6.68 2.34a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.74.32 1.53.55 2.34.68A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+            <h3>AI receptionist — Grace</h3>
+            <p>Answers every call in your business name, handles common questions, and books the consult while the caller is still on the line.</p>
+            <span class="status">Live</span>
+          </article>
+          <article class="card">
+            <div class="card-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <h3>Missed-call text-back</h3>
+            <p>When a call slips through, a polite text goes out from your number so the lead isn't left hanging. Opt-out always honored.</p>
+            <span class="status coming">Coming</span>
+          </article>
+          <article class="card">
+            <div class="card-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            </div>
+            <h3>Booking on the call</h3>
+            <p>Grace books consultations on your calendar during the call. New bookings can ping your team so nobody misses one.</p>
+            <span class="status">Live</span>
+          </article>
+          <article class="card">
+            <div class="card-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+            </div>
+            <h3>Follow-ups &amp; nurture</h3>
+            <p>Pipeline, breakup, and multi-week nurture workflows in your CRM — switched on only after you approve them.</p>
+            <span class="status">Live</span>
+          </article>
+          <article class="card">
+            <div class="card-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            </div>
+            <h3>CRM &amp; automations</h3>
+            <p>Works inside the tools you already use — CRM, calendar, texting, Discord, email. Your agent signs in once, then works across them.</p>
+            <span class="status">Live</span>
+          </article>
+          <article class="card">
+            <div class="card-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            </div>
+            <h3>Mission Control</h3>
+            <p>One branded portal to chat with your agent, see deliverables, track setup, and approve what goes out.</p>
+            <span class="status">Live</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="how" id="how">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="eyebrow">How it works</span>
+          <h2>One call. Your whole plan.</h2>
+          <p>You talk, we listen, and your busywork comes back mapped to what fixes it — then we build and switch it on only after you say go.</p>
+        </div>
+        <div class="steps">
+          <article class="step">
+            <div class="step-num">01</div>
+            <h3>Consultation call</h3>
+            <p>Tell us how your credit repair business runs — calls, leads, follow-ups, and the work that eats your week.</p>
+          </article>
+          <article class="step">
+            <div class="step-num">02</div>
+            <h3>Proposal in your brand</h3>
+            <p>Your pain points in your words, mapped to what we'll build. A person reviews it before you see it.</p>
+          </article>
+          <article class="step">
+            <div class="step-num">03</div>
+            <h3>Setup, then you sign off</h3>
+            <p>One form, one setup session. Everything is tested first and turned on only after your texting registration is approved and you say go.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="pricing" id="pricing">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="eyebrow">Pricing &amp; fit</span>
+          <h2>See what answering the phone could free up</h2>
+          <p>Use the slider to sketch time back in your week. Exact pricing is set on your consultation call — nothing below is a quote.</p>
+        </div>
+        <div class="roi-panel">
+          <div class="roi-card">
+            <h3>Missed-call sketch <span class="placeholder-tag">Illustrative</span></h3>
+            <p class="sub">Not a guarantee. Adjust the dials to match your shop. We walk real numbers on the demo call.</p>
+            <div class="slider-row">
+              <label>Calls per week <span id="v-calls">40</span></label>
+              <input type="range" id="calls" min="10" max="120" value="40" aria-valuemin="10" aria-valuemax="120" aria-valuenow="40" />
+            </div>
+            <div class="slider-row">
+              <label>Share you miss today <span id="v-miss">35%</span></label>
+              <input type="range" id="miss" min="10" max="70" value="35" aria-valuemin="10" aria-valuemax="70" aria-valuenow="35" />
+            </div>
+            <div class="slider-row">
+              <label>Minutes you spend per follow-up <span id="v-mins">8</span></label>
+              <input type="range" id="mins" min="3" max="20" value="8" aria-valuemin="3" aria-valuemax="20" aria-valuenow="8" />
+            </div>
+            <div class="roi-result">
+              <div class="big"><span id="v-hours">1.9</span> hrs / week</div>
+              <div class="note">Rough time that could go back to client work if those missed calls were answered and booked instead of chased. Results vary. Nothing guaranteed.</div>
+            </div>
+          </div>
+          <div class="plan-card" id="book">
+            <h3>Your plan</h3>
+            <p class="sub">Built on your accounts and number. You own the leads and the data.</p>
+            <div class="plan-price">Setup + month <small>· pricing on your call</small></div>
+            <p style="color:var(--muted);font-size:14px;margin:0 0 8px;">We go over exactly what we build for you on the consultation call. Dollar amounts are not listed here on purpose.</p>
+            <ul class="plan-list">
+              <li>
+                <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+                Grace, AI receptionist — answers 24/7 in your name
+              </li>
+              <li>
+                <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+                Your agent + private line — call or text tasks from your phone
+              </li>
+              <li>
+                <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+                Follow-up, post drafts, onboarding &amp; Mission Control
+              </li>
+              <li>
+                <svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+                Nothing goes out until you approve it
+              </li>
+            </ul>
+            <a class="btn btn-primary" href="tel:+14078639276" style="width:100%;">Book a demo · call Grace</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="social" id="proof">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="eyebrow">Social proof</span>
+          <h2>What owners say <span class="placeholder-tag">Placeholders</span></h2>
+          <p>Real testimonials and logos will replace these once Patrick approves. Marked clearly so nothing looks like a live claim.</p>
+        </div>
+        <div class="quotes">
+          <blockquote class="quote">
+            <p>“Placeholder — Client name will describe how Grace handled after-hours calls for their credit repair shop.”</p>
+            <div class="who">
+              <div class="avatar">CN</div>
+              <div>
+                <div class="name">Client name</div>
+                <div class="role">Credit repair · City, ST · Placeholder</div>
+              </div>
+            </div>
+          </blockquote>
+          <blockquote class="quote">
+            <p>“Placeholder — Client name will talk about booking consults during the call instead of playing phone tag.”</p>
+            <div class="who">
+              <div class="avatar">CN</div>
+              <div>
+                <div class="name">Client name</div>
+                <div class="role">Credit repair · City, ST · Placeholder</div>
+              </div>
+            </div>
+          </blockquote>
+          <blockquote class="quote">
+            <p>“Placeholder — Client name will mention Mission Control and approving every message before it sends.”</p>
+            <div class="who">
+              <div class="avatar">CN</div>
+              <div>
+                <div class="name">Client name</div>
+                <div class="role">Credit repair · City, ST · Placeholder</div>
+              </div>
+            </div>
+          </blockquote>
+        </div>
+      </div>
+    </section>
+
+    <section class="faq" id="faq">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="eyebrow">FAQ</span>
+          <h2>Straight answers</h2>
+        </div>
+        <div class="faq-list">
+          <details>
+            <summary>Does Grace replace my team?</summary>
+            <div class="ans">No. She answers and books what she can, then hands anything sensitive to a person on your team. You stay the owner of the relationship.</div>
+          </details>
+          <details>
+            <summary>Whose phone number does she use?</summary>
+            <div class="ans">Yours. Grace is built on your business number and accounts. You own the leads and the data.</div>
+          </details>
+          <details>
+            <summary>Can she say the wrong thing to a client?</summary>
+            <div class="ans">She's trained on your scripts and knows when to escalate. New automations are tested on a test contact and switched on only after you approve. Quiet hours and opt-out rules apply to texts.</div>
+          </details>
+          <details>
+            <summary>Is this compliant for credit repair?</summary>
+            <div class="ans">We design for credit-repair workflows and avoid guarantee language in outbound copy. Compliance features support — but don't replace — your own legal review. This is not legal advice.</div>
+          </details>
+          <details>
+            <summary>How do I try her before buying?</summary>
+            <div class="ans">Call the live demo line: (407) 863-9276. Then book a consultation call and we'll map what we'd build for your shop.</div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section class="final">
+      <div class="wrap">
+        <h2>Your next employee never sleeps.</h2>
+        <p>Book one consultation call. We'll map what's eating your week and show you the AI team that takes it off your plate.</p>
+        <div class="hero-ctas">
+          <a class="btn btn-primary" href="#book">Book a demo</a>
+          <a class="btn btn-ghost" href="tel:+14078639276">Call Grace · (407) 863-9276</a>
+        </div>
+        <p class="disclaimer">
+          Illustrative visuals only. Results vary and nothing is guaranteed. Nothing goes out to your customers until you've approved it.
+          Features marked “Coming” aren't available yet. Statistics, when shown, come from the third-party studies cited beside them.
+          Compliance features support, but don't replace, your own legal review; this is not legal advice.
+          Mockup for Conquest AI review — not published.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap foot-inner">
+      <span>© 2026 Conquest AI · The Machine mockup</span>
+      <span>Blue · silver · white · local preview only</span>
+    </div>
+  </footer>
+
+<script>
+(function () {
+  const canvas = document.getElementById("wave-canvas");
+  const ctx = canvas.getContext("2d", { alpha: true });
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let w = 0, h = 0, dpr = 1, raf = 0, t0 = performance.now();
+  const pointer = { x: 0.5, y: 0.45, tx: 0.5, ty: 0.45 };
+  const PARTICLE_COUNT = reduced ? 220 : 1400;
+  const particles = [];
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = canvas.clientWidth;
+    h = canvas.clientHeight;
+    canvas.width = Math.floor(w * dpr);
+    canvas.height = Math.floor(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function waveY(nx, time) {
+    // Voice-waveform silhouette: multi-harmonic envelope across center
+    const env = Math.exp(-Math.pow((nx - 0.5) * 2.2, 2));
+    const a = Math.sin(nx * Math.PI * 6 + time * 1.6) * 0.045;
+    const b = Math.sin(nx * Math.PI * 14 + time * 2.4) * 0.022;
+    const c = Math.sin(nx * Math.PI * 3 - time * 0.9) * 0.03;
+    return 0.48 + (a + b + c) * (0.55 + env * 1.4) + (pointer.y - 0.45) * 0.12;
+  }
+
+  function seed() {
+    particles.length = 0;
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      particles.push({
+        nx: Math.random(),
+        offset: (Math.random() - 0.5) * 0.18,
+        size: 0.6 + Math.random() * 1.8,
+        speed: 0.15 + Math.random() * 0.55,
+        phase: Math.random() * Math.PI * 2,
+        hue: Math.random(), // 0 blue → 1 silver/cyan
+      });
+    }
+  }
+
+  function colorFor(p, alpha) {
+    // blue → cyan → silver
+    if (p.hue < 0.45) return `rgba(31,111,255,${alpha})`;
+    if (p.hue < 0.75) return `rgba(2,161,254,${alpha})`;
+    if (p.hue < 0.9) return `rgba(124,196,255,${alpha})`;
+    return `rgba(232,236,240,${alpha})`;
+  }
+
+  function frame(now) {
+    const time = (now - t0) / 1000;
+    pointer.x += (pointer.tx - pointer.x) * 0.06;
+    pointer.y += (pointer.ty - pointer.y) * 0.06;
+    ctx.clearRect(0, 0, w, h);
+
+    // soft blue glow behind waveform
+    const g = ctx.createRadialGradient(w * pointer.x, h * 0.48, 20, w * 0.5, h * 0.48, w * 0.55);
+    g.addColorStop(0, "rgba(2,161,254,0.18)");
+    g.addColorStop(0.45, "rgba(0,71,223,0.08)");
+    g.addColorStop(1, "rgba(5,11,24,0)");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
+
+    for (const p of particles) {
+      const drift = Math.sin(time * p.speed + p.phase) * 0.012;
+      const nx = (p.nx + drift + time * 0.008 * p.speed) % 1;
+      const base = waveY(nx, time);
+      // attract slightly toward pointer along x
+      const pull = (pointer.x - nx) * 0.04;
+      const ny = base + p.offset * (0.7 + Math.abs(pointer.x - nx) * 0.8) + pull * 0.15
+        + Math.sin(time * 2 + p.phase) * 0.006;
+      const x = nx * w;
+      const y = ny * h;
+      const dist = Math.hypot(nx - pointer.x, ny - pointer.y);
+      const alpha = Math.max(0.15, 0.85 - dist * 1.4) * (0.45 + p.size * 0.2);
+      ctx.beginPath();
+      ctx.fillStyle = colorFor(p, alpha);
+      ctx.arc(x, y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // denser center ribbon (waveform core)
+    ctx.beginPath();
+    for (let i = 0; i <= 80; i++) {
+      const nx = i / 80;
+      const y = waveY(nx, time) * h;
+      const x = nx * w;
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle = "rgba(124,196,255,0.55)";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    if (!reduced) raf = requestAnimationFrame(frame);
+  }
+
+  function onMove(e) {
+    const rect = canvas.getBoundingClientRect();
+    pointer.tx = (e.clientX - rect.left) / rect.width;
+    pointer.ty = (e.clientY - rect.top) / rect.height;
+  }
+
+  window.addEventListener("resize", () => { resize(); });
+  window.addEventListener("pointermove", onMove, { passive: true });
+  resize();
+  seed();
+  if (reduced) {
+    // static paint
+    frame(performance.now());
+  } else {
+    raf = requestAnimationFrame(frame);
+  }
+
+  // ROI sliders
+  const calls = document.getElementById("calls");
+  const miss = document.getElementById("miss");
+  const mins = document.getElementById("mins");
+  function updateRoi() {
+    const c = +calls.value, m = +miss.value, mi = +mins.value;
+    document.getElementById("v-calls").textContent = c;
+    document.getElementById("v-miss").textContent = m + "%";
+    document.getElementById("v-mins").textContent = mi;
+    calls.setAttribute("aria-valuenow", c);
+    miss.setAttribute("aria-valuenow", m);
+    mins.setAttribute("aria-valuenow", mi);
+    const hours = (c * (m / 100) * mi) / 60;
+    document.getElementById("v-hours").textContent = hours.toFixed(1);
+  }
+  [calls, miss, mins].forEach((el) => el.addEventListener("input", updateRoi));
+  updateRoi();
+})();
+</script>
+</body>
+</html>
